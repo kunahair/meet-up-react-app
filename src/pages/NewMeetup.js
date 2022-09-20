@@ -1,6 +1,9 @@
 import NewMeetupForm from "../components/meetups/NewMeetupForm";
+import {useNavigate} from 'react-router-dom';
 
 function NewMeetupPage() {
+
+    const hisotry = useNavigate();
 
     function addMeetupHandler(meetupData) {
         fetch(
@@ -12,7 +15,9 @@ function NewMeetupPage() {
                     'Content-Type' : 'appplication/json'
                 }
             }
-        );
+        ).then((resposnse) => {
+            hisotry('/', {replace: true});
+        });
     }
 
     return (
