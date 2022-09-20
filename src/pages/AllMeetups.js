@@ -1,5 +1,7 @@
 import MeetupList from "../components/meetups/MeetupList";
 
+import { useState, useEffect } from "react";
+
 const DUMMY_DATA = [
     {
       id: 'm1',
@@ -22,12 +24,54 @@ const DUMMY_DATA = [
   ];
 
 function AllMeetupsPage() {
+
+  const [isLoading, setIsLoading] = useState(true)
+  const [data, setData] = useState([])
+
+  //Use effect controls when a function is triggered
+  //This will stop the fetch being triggered every time the component
+  // reloads. It reloads on every state change.
+  useEffect(() => {
+    setIsLoading(true);
+
+    fetch('https://react-getting-started-e7eb7-default-rtdb.asia-southeast1.firebasedatabase.app/meetups.json')
+    .then((resp) => {
+      return resp.json();
+    }).then((data) => {
+
+      //Data returned from Firebase is an object,
+      //need to convert to an array
+      const meetups = [];
+      for (const key in data) {
+        const meetup = {
+          id: key,
+          ...data[key]
+        };
+        meetups.push(meetup);
+      }
+
+      //Wrap in timeout to show that loading is working
+      setTimeout(() => {
+        setIsLoading(false);
+        setData(meetups);
+      }, 1000);      
+    });
+  }, []); //<--- We need the empty brackeds to ensure a single trigger
+
+  if (isLoading) {
     return (
-        <section>
-            <h1>All Meetups</h1>
-            <MeetupList meetups={DUMMY_DATA} />
-        </section>
+      <section>
+        <p>Loading ...</p>
+      </section>
     );
+  }
+
+  return (
+      <section>
+          <h1>All Meetups</h1>
+          <MeetupList meetups={data} />
+      </section>
+  );
 }
 
 export default AllMeetupsPage;
